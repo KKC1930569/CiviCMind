@@ -26,6 +26,7 @@ wheels/
 
 # Database / Storage
 *.db
+*.sqlite
 *.sqlite3
 uploads/*
 !uploads/.gitkeep
@@ -34,10 +35,14 @@ backend/uploads/*
 
 # Environment & Secrets
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 *.pem
 *.key
+
+# Model Weights
+*.pt
+backend/models/*.pt
 
 # Node / Frontend
 node_modules/
@@ -49,8 +54,10 @@ dist/
 dist-ssr/
 *.local
 
-# IDEs
+# IDEs & System
 .vscode/
 .idea/
 *.swp
 *.swo
+.DS_Store
+Thumbs.db

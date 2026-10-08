@@ -100,14 +100,46 @@ def register_authority(user_in: AuthorityRegister, db: Session = Depends(get_db)
     db.refresh(user)
     return user
 
+from fastapi.security import OAuth2PasswordRequestForm
+
 @router.post("/login", response_model=Token)
 def login(login_in: UserLogin, db: Session = Depends(get_db)):
     """
-    Authenticates a user and issues a signed JWT bearer token.
+    Authenticates a user and issues a signed JWT bearer token (JSON format).
     """
     email_clean = login_in.email.strip().lower()
     user = db.query(User).filter(User.email == email_clean).first()
     if not user or not verify_password(login_in.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Account has been deactivated. Please contact support."
+        )
+    
+    token = create_access_token(data={"sub": str(user.id), "role": user.role})
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": user
+    }
+
+@router.post("/token", response_model=Token)
+def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
+    """
+    Standard OAuth2 password flow endpoint for Swagger UI Authorize button and OAuth2 clients.
+    """
+    email_clean = form_data.username.strip().lower()
+    user = db.query(User).filter(User.email == email_clean).first()
+    if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password.",

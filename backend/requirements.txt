@@ -1,7 +1,11 @@
 fastapi>=0.115.0
 uvicorn>=0.30.0
 sqlalchemy>=2.0.30
-pydantic>=2.7.0
+pydantic[email]>=2.7.0
 pwdlib[argon2]>=0.3.0
 python-jose>=3.3.0
 python-multipart>=0.0.9
+ultralytics>=8.3.0
+torch>=2.0.0
+torchvision>=0.15.0
+pillow>=10.0.0

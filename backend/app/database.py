@@ -34,6 +34,9 @@ def ensure_sqlite_columns():
             cols = [row[1] for row in res.fetchall()]
             if cols:
                 report_new_cols = [
+                    ("case_id", "VARCHAR(50)"),
+                    ("defect_type", "VARCHAR(100)"),
+                    ("ai_confidence", "FLOAT"),
                     ("priority_level", "VARCHAR(50) DEFAULT 'MEDIUM'"),
                     ("severity", "VARCHAR(50) DEFAULT 'MEDIUM'"),
                     ("factor_breakdown", "TEXT"),
@@ -63,6 +66,7 @@ def ensure_sqlite_columns():
                     ("has_gps_metadata", "BOOLEAN DEFAULT 0"),
                     ("evidence_confidence", "VARCHAR(50) DEFAULT 'MEDIUM'"),
                     ("confidence_reasons", "TEXT"),
+                    ("ai_detections", "TEXT"),
                 ]
                 for col_name, col_type in ev_new_cols:
                     if col_name not in cols:

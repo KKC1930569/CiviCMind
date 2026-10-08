@@ -20,7 +20,8 @@ from app.services.impact_engine import impact_engine, ImpactForecast, RepairSimu
 from app.services.evidence_confidence import evidence_evaluator
 from app.services.infrastructure_memory import memory_service
 from app.services.work_order_service import work_order_service, MunicipalWorkOrder
-from app.services.ai import ai_service
+from app.services.ai import ai_service, AIDetectionResponse
+from app.ai.detector import detect_issue_response
 
 router = APIRouter(prefix="/reports", tags=["Reports"])
 
@@ -55,7 +56,53 @@ async def create_report(
     nearby_reports, repeat_count = memory_service.query_nearby_cluster(db, latitude, longitude)
     is_repeated = repeat_count > 0
 
-    # 2. Human Impact Engine: Calculate explainable 0-100 score & priority
+    # 2. Evidence Processing & Real YOLO Inference (if image provided)
+    ai_res = None
+    stored_evidence_info = None
+
+    if image and image.filename:
+        file_url, stored_filename, file_size, content_type = await storage_service.save_upload_file(image)
+        file_path_on_disk = settings.UPLOAD_DIR / stored_filename
+
+        raw_hash = evidence_evaluator.calculate_file_hash(file_path_on_disk)
+        dup_exists = db.query(Evidence).filter(Evidence.file_hash == raw_hash).first() is not None
+
+        conf_level, conf_score, conf_reasons, f_hash = evidence_evaluator.evaluate(
+            file_path=file_path_on_disk,
+            is_camera_capture=(capture_source == "CAMERA"),
+            has_gps=(latitude is not None and longitude is not None),
+            is_duplicate_hash=dup_exists
+        )
+
+        # Real YOLO Model Inference via modular AI detector
+        ai_res = detect_issue_response(str(file_path_on_disk))
+
+        stored_evidence_info = {
+            "file_url": file_url,
+            "stored_filename": stored_filename,
+            "file_size": file_size,
+            "content_type": content_type,
+            "conf_level": conf_level,
+            "conf_reasons": conf_reasons,
+            "f_hash": f_hash,
+            "ai_res": ai_res,
+        }
+
+        # If YOLO detected a confident defect and reporter used generic category, adapt to AI category
+        if ai_res and ai_res.success and ai_res.defect and ai_res.confidence >= 0.35:
+            if category in [ReportCategory.OTHER.value, "OTHER"]:
+                category = ai_res.category
+            # Adopt YOLO estimated severity if not explicitly marked CRITICAL by citizen
+            if severity.upper() not in ["CRITICAL"]:
+                severity = ai_res.severity
+
+    # 3. Human Impact Engine: Calculate explainable score & priority incorporating AI detection
+    ai_defect_name = ai_res.defect if (ai_res and ai_res.success) else None
+    ai_conf_score = ai_res.confidence if (ai_res and ai_res.success) else None
+    max_area_ratio = None
+    if ai_res and ai_res.detections:
+        max_area_ratio = max((d.area_ratio or 0.0 for d in ai_res.detections), default=None)
+
     eval_result = impact_engine.evaluate(
         category=category,
         description=description,
@@ -64,7 +111,10 @@ async def create_report(
         affects_mobility_impaired=affects_mobility_impaired,
         location_context=location_context,
         repeat_count=repeat_count,
-        has_gps=(location_type == LocationType.GPS.value)
+        has_gps=(location_type == LocationType.GPS.value),
+        ai_defect=ai_defect_name,
+        ai_confidence=ai_conf_score,
+        affected_area_ratio=max_area_ratio
     )
 
     report = Report(
@@ -77,6 +127,10 @@ async def create_report(
         longitude=longitude,
         address=address.strip() if address else None,
         
+        # Incident Case Identification & YOLO AI Defect
+        defect_type=ai_defect_name,
+        ai_confidence=ai_conf_score,
+
         # Intelligence Layer
         human_impact_score=float(eval_result.impact_score),
         priority_level=eval_result.priority,
@@ -100,38 +154,28 @@ async def create_report(
     db.add(report)
     db.flush()
 
-    # 3. Evidence Handling & Confidence Analysis
-    if image and image.filename:
-        file_url, stored_filename, file_size, content_type = await storage_service.save_upload_file(image)
-        file_path_on_disk = settings.UPLOAD_DIR / stored_filename
+    # Assign unique case ID based on sequential integer ID
+    report.case_id = f"CM-2026-{report.id:06d}"
 
-        # Evidence Confidence evaluation
-        # Check if identical hash exists in prior evidence
-        raw_hash = evidence_evaluator.calculate_file_hash(file_path_on_disk)
-        dup_exists = db.query(Evidence).filter(Evidence.file_hash == raw_hash).first() is not None
-
-        conf_level, conf_score, conf_reasons, f_hash = evidence_evaluator.evaluate(
-            file_path=file_path_on_disk,
-            is_camera_capture=(capture_source == "CAMERA"),
-            has_gps=(latitude is not None and longitude is not None),
-            is_duplicate_hash=dup_exists
-        )
-
-        # AI Detection Layer Stub
-        ai_res = await ai_service.analyze_image(str(file_path_on_disk))
+    # 4. Attach Evidence Record with YOLO bounding box JSON
+    if stored_evidence_info:
+        raw_detections_json = None
+        if ai_res and ai_res.detections:
+            raw_detections_json = json.dumps([d.model_dump() for d in ai_res.detections])
 
         evidence = Evidence(
             report_id=report.id,
-            file_path=file_url,
-            filename=stored_filename,
-            file_size=file_size,
-            mime_type=content_type,
-            confidence=ai_res.confidence,
+            file_path=stored_evidence_info["file_url"],
+            filename=stored_evidence_info["stored_filename"],
+            file_size=stored_evidence_info["file_size"],
+            mime_type=stored_evidence_info["content_type"],
+            confidence=ai_res.confidence if ai_res else 1.0,
             capture_source=capture_source or "UPLOAD",
-            file_hash=f_hash,
+            file_hash=stored_evidence_info["f_hash"],
             has_gps_metadata=(latitude is not None and longitude is not None),
-            evidence_confidence=conf_level,
-            confidence_reasons="; ".join(conf_reasons)
+            evidence_confidence=stored_evidence_info["conf_level"],
+            confidence_reasons="; ".join(stored_evidence_info["conf_reasons"]),
+            ai_detections=raw_detections_json
         )
         db.add(evidence)
 
@@ -386,3 +430,43 @@ def update_report_status(
     db.commit()
     db.refresh(report)
     return report
+
+@router.post("/detect", response_model=AIDetectionResponse)
+async def detect_hazard_in_reports(
+    image: Optional[UploadFile] = File(None),
+    file: Optional[UploadFile] = File(None)
+):
+    """
+    Direct YOLO inference endpoint for previewing detections before report submission.
+    """
+    upload = image or file
+    if not upload or not upload.filename:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Please upload a valid image file."
+        )
+
+    file_url, stored_filename, file_size, content_type = await storage_service.save_upload_file(upload)
+    file_path = settings.UPLOAD_DIR / stored_filename
+    res = detect_issue_response(str(file_path))
+    return res
+
+@router.get("/map/reports", response_model=List[ReportResponse])
+def get_map_reports_list(
+    category: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
+    priority: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+):
+    """
+    Returns spatial incidents with coordinates for Leaflet map views.
+    """
+    query = db.query(Report).filter(Report.latitude.isnot(None), Report.longitude.isnot(None))
+    if category and category in [c.value for c in ReportCategory]:
+        query = query.filter(Report.category == category)
+    if status and status in [s.value for s in ReportStatus]:
+        query = query.filter(Report.status == status)
+    if priority and priority in [p.value for p in PriorityLevel]:
+        query = query.filter(Report.priority_level == priority)
+    return query.all()
+

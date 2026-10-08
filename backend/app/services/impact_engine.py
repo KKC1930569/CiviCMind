@@ -56,10 +56,21 @@ class ImpactEngine:
         affects_mobility_impaired: bool = False,
         location_context: Optional[str] = None,
         repeat_count: int = 0,
-        has_gps: bool = False
+        has_gps: bool = False,
+        ai_defect: Optional[str] = None,
+        ai_confidence: Optional[float] = None,
+        affected_area_ratio: Optional[float] = None
     ) -> ImpactEvaluationResult:
         desc_lower = description.lower()
         reasons: List[str] = []
+
+        # 0. YOLO AI Evidence Integration
+        if ai_defect and ai_confidence is not None and ai_confidence > 0:
+            reasons.append(f"Real YOLO AI detected '{ai_defect.replace('_', ' ')}' with {ai_confidence*100:.1f}% confidence")
+            if affected_area_ratio and affected_area_ratio >= 0.10:
+                reasons.append(f"Significant visual footprint ({affected_area_ratio*100:.1f}% of frame) indicates prominent physical hazard")
+            elif ai_confidence >= 0.60:
+                reasons.append(f"High AI verification confidence ({ai_confidence*100:.1f}%) confirms defect integrity")
 
         # 1. Infrastructure Severity (0 - 30 points)
         sev_upper = (severity or "MEDIUM").upper()
@@ -84,7 +95,7 @@ class ImpactEngine:
             reasons.append("Directly disrupts active pedestrian right-of-way")
         elif category in ["POTHOLE", "ROAD_DAMAGE"]:
             ped_points = 14
-            reasons.append("Hazard affecting crosswalks, micro-mobility, and roadway crossings")
+            reasons.append("Hazard affecting roadway travel and pedestrian crosswalks")
         elif category == "GARBAGE":
             ped_points = 12
             reasons.append("Sidewalk obstruction and public sanitation impediment")
@@ -140,23 +151,32 @@ class ImpactEngine:
             reasons.append("High-density commercial pedestrian zone")
         elif has_gps:
             loc_points = 6
-            reasons.append("Verified municipal spatial telemetry")
+            reasons.append("Verified municipal spatial telemetry via GPS")
+        else:
+            reasons.append("General municipal zone (no immediate critical facility cluster specified)")
 
         # 5. Historical / Repeat Impact (0 - 10 points)
         if repeat_count >= 3:
             hist_points = 10
-            reasons.append(f"Chronic recurring hazard ({repeat_count}+ related community reports)")
+            reasons.append(f"Chronic recurring hazard ({repeat_count}+ related community reports recorded nearby)")
         elif repeat_count == 2:
             hist_points = 7
-            reasons.append("Repeated incident cluster identified near this location")
+            reasons.append("Repeated incident cluster identified near this location (2 prior reports)")
         elif repeat_count == 1:
             hist_points = 4
             reasons.append("Prior report documented at adjacent coordinates")
         else:
             hist_points = 0
+            reasons.append("No prior incident history recorded in this spatial sector")
 
-        # Total Calculation (Normalized to 0 - 100)
-        total_score = min(100, max(0, sev_points + ped_points + acc_points + loc_points + hist_points))
+        # Total Human Impact Score (Normalized 0 - 100)
+        # Integrates Severity (up to 28), Pedestrian (up to 25), Accessibility (up to 25),
+        # Location Context (up to 15), and History (up to 10)
+        base_score = sev_points + ped_points + acc_points + loc_points + hist_points
+        if ai_confidence and ai_confidence >= 0.60:
+            # AI high confidence confirms objective physical defect
+            base_score = min(100, base_score + 2)
+        total_score = min(100, max(0, base_score))
 
         # Priority Level
         if total_score >= 80:

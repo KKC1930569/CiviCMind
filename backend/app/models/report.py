@@ -56,6 +56,11 @@ class Report(Base):
     longitude = Column(Float, nullable=True)
     address = Column(String(500), nullable=True)
     
+    # Incident Case Identification & YOLO AI Defect
+    case_id = Column(String(50), nullable=True, index=True)
+    defect_type = Column(String(100), nullable=True)
+    ai_confidence = Column(Float, nullable=True)
+
     # Human Impact & Intelligence Layer
     human_impact_score = Column(Float, nullable=False, default=50.0) # Normalized 0-100
     priority_level = Column(String(50), nullable=False, default=PriorityLevel.MEDIUM.value)

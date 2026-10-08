@@ -3,14 +3,22 @@ from app.services.ai.interface import (
     AIDetectionResponse,
     BoundingBox,
     AccessibilityFeatureDetection,
+    YOLODetectionItem,
+    BBoxDict,
 )
-from app.services.ai.stub_service import PluggableAIService, ai_service
+from app.services.ai.yolo_service import YOLOAnalysisService, yolo_service
+
+ai_service = yolo_service
 
 __all__ = [
     "BaseAIAnalysisService",
     "AIDetectionResponse",
     "BoundingBox",
     "AccessibilityFeatureDetection",
-    "PluggableAIService",
+    "YOLODetectionItem",
+    "BBoxDict",
+    "YOLOAnalysisService",
+    "yolo_service",
     "ai_service",
 ]
+

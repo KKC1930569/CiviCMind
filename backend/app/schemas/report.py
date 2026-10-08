@@ -16,6 +16,7 @@ class EvidenceResponse(BaseModel):
     file_hash: Optional[str] = None
     evidence_confidence: Optional[str] = "MEDIUM"
     confidence_reasons: Optional[str] = None
+    ai_detections: Optional[str] = None
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -41,6 +42,9 @@ class ReportUpdateStatus(BaseModel):
 
 class ReportResponse(BaseModel):
     id: int
+    case_id: Optional[str] = None
+    defect_type: Optional[str] = None
+    ai_confidence: Optional[float] = None
     title: str
     description: str
     category: ReportCategory

@@ -20,6 +20,9 @@ class Evidence(Base):
     has_gps_metadata = Column(Boolean, default=False, nullable=True)
     evidence_confidence = Column(String(50), default="MEDIUM", nullable=True) # HIGH | MEDIUM | LOW
     confidence_reasons = Column(Text, nullable=True)
+    
+    # YOLO AI Detection Storage (JSON serialized bounding boxes and classes)
+    ai_detections = Column(Text, nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 

@@ -574,6 +574,17 @@ export const AuthorityDashboardPage: React.FC = () => {
                       <td className="py-3 px-4 max-w-sm">
                         <div className="font-semibold text-white truncate flex items-center gap-2">
                           <span className="truncate">{r.title}</span>
+                          {r.case_id && (
+                            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 shrink-0">
+                              {r.case_id}
+                            </span>
+                          )}
+                          {r.defect_type && (
+                            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 shrink-0 flex items-center gap-1">
+                              <Sparkles className="w-2.5 h-2.5" />
+                              {r.defect_type.replace(/_/g, ' ')}
+                            </span>
+                          )}
                           {r.is_demo_data && (
                             <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20 shrink-0">
                               DEMO

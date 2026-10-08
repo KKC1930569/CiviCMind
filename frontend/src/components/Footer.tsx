@@ -14,7 +14,7 @@ export const Footer: React.FC = () => {
   ];
 
   return (
-    <footer className="mt-auto border-t border-slate-800 bg-slate-950/60 backdrop-blur-sm text-slate-400">
+    <footer className="mt-auto border-t border-slate-800 bg-slate-950/60 backdrop-blur-sm text-slate-400 pb-20 md:pb-0">
       {/* Pipeline Visual Ribbon */}
       <div className="border-b border-slate-800/80 py-5 bg-slate-900/40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

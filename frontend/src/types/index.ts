@@ -41,6 +41,34 @@ export type AccessibilityBarrierType =
   | 'WHEELCHAIR_ROUTE_BARRIER'
   | 'NONE';
 
+export interface BBoxDict {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+}
+
+export interface YOLODetectionItem {
+  class_name: string;
+  confidence: number;
+  bbox: BBoxDict;
+  area_ratio?: number;
+}
+
+export interface AIDetectionResponse {
+  success: boolean;
+  category: string;
+  defect?: string;
+  confidence: number;
+  severity: string;
+  severity_score: number;
+  severity_reasons: string[];
+  image_width?: number;
+  image_height?: number;
+  detections: YOLODetectionItem[];
+  message?: string;
+}
+
 export interface Evidence {
   id: number;
   report_id: number;
@@ -54,11 +82,15 @@ export interface Evidence {
   has_gps_metadata?: boolean;
   evidence_confidence?: 'HIGH' | 'MEDIUM' | 'LOW';
   confidence_reasons?: string;
+  ai_detections?: string;
   created_at: string;
 }
 
 export interface Report {
   id: number;
+  case_id?: string;
+  defect_type?: string;
+  ai_confidence?: number;
   title: string;
   description: string;
   category: ReportCategory;

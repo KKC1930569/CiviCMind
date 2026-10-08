@@ -6,7 +6,8 @@ import type {
   PriorityLevel,
   ImpactForecast, 
   RepairSimulationResult, 
-  MunicipalWorkOrder 
+  MunicipalWorkOrder,
+  AIDetectionResponse 
 } from '../types';
 
 export interface ReportFilterParams {
@@ -26,6 +27,15 @@ export interface UpdateStatusPayload {
 }
 
 export const reportsApi = {
+  detectHazard: async (formData: FormData): Promise<AIDetectionResponse> => {
+    const res = await apiClient.post<AIDetectionResponse>('/detect', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return res.data;
+  },
+
   createReport: async (formData: FormData): Promise<Report> => {
     const res = await apiClient.post<Report>('/reports', formData, {
       headers: {

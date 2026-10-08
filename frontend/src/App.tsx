@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { MobileBottomNav } from './components/MobileBottomNav';
 
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
@@ -15,6 +16,8 @@ import { ReportIssuePage } from './pages/ReportIssuePage';
 import { MyReportsPage } from './pages/MyReportsPage';
 import { ReportDetailPage } from './pages/ReportDetailPage';
 import { AuthorityDashboardPage } from './pages/AuthorityDashboardPage';
+import { MapPage } from './pages/MapPage';
+import { ProfilePage } from './pages/ProfilePage';
 
 export const App: React.FC = () => {
   return (
@@ -22,7 +25,7 @@ export const App: React.FC = () => {
       <BrowserRouter>
         <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-cyan-500/20 selection:text-cyan-300">
           <Navbar />
-          <main className="flex-1">
+          <main className="flex-1 pb-16 md:pb-0">
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<LandingPage />} />
@@ -44,6 +47,14 @@ export const App: React.FC = () => {
                 element={
                   <ProtectedRoute>
                     <CitizenDashboardPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/map"
+                element={
+                  <ProtectedRoute>
+                    <MapPage />
                   </ProtectedRoute>
                 }
               />
@@ -71,6 +82,14 @@ export const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Protected Authority Route */}
               <Route
@@ -87,6 +106,7 @@ export const App: React.FC = () => {
             </Routes>
           </main>
           <Footer />
+          <MobileBottomNav />
         </div>
       </BrowserRouter>
     </AuthProvider>

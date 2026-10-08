@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { reportsApi } from '../api/reports';
-import type { Report, ReportStatus, PriorityLevel, ImpactFactors } from '../types';
+import type { Report, ReportStatus, PriorityLevel, ImpactFactors, YOLODetectionItem } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { StatusBadge } from '../components/StatusBadge';
 import { CategoryBadge } from '../components/CategoryBadge';
@@ -10,6 +10,7 @@ import { LocationPickerMap } from '../components/LocationPickerMap';
 import { WhatIfSimulatorModal } from '../components/WhatIfSimulatorModal';
 import { WorkOrderModal } from '../components/WorkOrderModal';
 import { ImpactForecastView } from '../components/ImpactForecastView';
+import { DetectionOverlay } from '../components/DetectionOverlay';
 import { 
   ArrowLeft, 
   MapPin, 
@@ -176,9 +177,18 @@ export const ReportDetailPage: React.FC = () => {
       {/* Main Header & Title */}
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider font-semibold">
-            Incident Case #{report.id.toString().padStart(5, '0')}
+          <span className="text-xs font-mono px-2.5 py-1 rounded-md bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 uppercase tracking-wider font-bold">
+            {report.case_id || `CM-2026-${report.id.toString().padStart(6, '0')}`}
           </span>
+          {report.defect_type && (
+            <span className="text-xs font-mono px-2.5 py-1 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 font-semibold flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              YOLO AI: <strong className="uppercase">{report.defect_type.replace(/_/g, ' ')}</strong>
+              {report.ai_confidence != null && (
+                <span className="text-slate-400">({(report.ai_confidence * 100).toFixed(1)}%)</span>
+              )}
+            </span>
+          )}
           <ImpactScoreIndicator score={report.human_impact_score} priority={report.priority_level} showDetails size="lg" />
         </div>
 
@@ -391,23 +401,39 @@ export const ReportDetailPage: React.FC = () => {
 
             {report.evidence && report.evidence.length > 0 ? (
               <div className="space-y-3">
-                {report.evidence.map((ev) => (
-                  <div key={ev.id} className="rounded-xl overflow-hidden border border-slate-700 bg-slate-950 space-y-2">
-                    <a
-                      href={ev.file_path}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title="Click to view full image"
-                    >
-                      <img
-                        src={ev.file_path}
-                        alt="Evidence"
-                        className="w-full h-56 object-cover hover:scale-105 transition"
+                {report.evidence.map((ev) => {
+                  let parsedDetections: YOLODetectionItem[] = [];
+                  if (ev.ai_detections) {
+                    try {
+                      parsedDetections = JSON.parse(ev.ai_detections);
+                    } catch (e) {
+                      parsedDetections = [];
+                    }
+                  }
+
+                  return (
+                    <div key={ev.id} className="rounded-xl overflow-hidden border border-slate-700 bg-slate-950 space-y-2">
+                      <DetectionOverlay
+                        imageUrl={ev.file_path}
+                        detections={parsedDetections}
+                        alt="Photographic evidence with AI bounding boxes"
+                        maxHeight="max-h-72"
                       />
-                    </a>
-                    
-                    {/* Evidence Quality Signals */}
-                    <div className="p-3 text-[11px] text-slate-400 space-y-1.5 bg-slate-950">
+
+                      {parsedDetections.length > 0 && (
+                        <div className="px-3 py-2 bg-slate-900 border-t border-b border-slate-800 text-[11px] text-slate-300 flex items-center justify-between">
+                          <span className="font-semibold text-cyan-300 flex items-center gap-1.5">
+                            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                            YOLO AI Detections:
+                          </span>
+                          <span className="font-mono text-slate-200">
+                            {parsedDetections.length} object{parsedDetections.length > 1 ? 's' : ''} found
+                          </span>
+                        </div>
+                      )}
+                      
+                      {/* Evidence Quality Signals */}
+                      <div className="p-3 text-[11px] text-slate-400 space-y-1.5 bg-slate-950">
                       <div className="flex items-center justify-between">
                         <span className="flex items-center gap-1 font-semibold text-slate-300">
                           <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
@@ -445,7 +471,8 @@ export const ReportDetailPage: React.FC = () => {
                       )}
                     </div>
                   </div>
-                ))}
+                );
+              })}
               </div>
             ) : (
               <div className="p-8 rounded-xl bg-slate-950 border border-dashed border-slate-800 text-center text-xs text-slate-400">
