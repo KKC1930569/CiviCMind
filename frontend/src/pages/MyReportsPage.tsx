@@ -77,7 +77,7 @@ export const MyReportsPage: React.FC = () => {
           />
         </div>
 
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0">
+        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
           {['ALL', 'OPEN', 'IN_PROGRESS', 'RESOLVED'].map((st) => (
             <button
               key={st}

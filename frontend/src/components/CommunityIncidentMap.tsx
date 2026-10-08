@@ -48,7 +48,15 @@ export const CommunityIncidentMap: React.FC<Props> = ({
     markersLayerRef.current = layerGroup;
     mapInstanceRef.current = map;
 
+    const resizeObserver = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+    if (mapContainerRef.current) {
+      resizeObserver.observe(mapContainerRef.current);
+    }
+
     return () => {
+      resizeObserver.disconnect();
       map.remove();
       mapInstanceRef.current = null;
     };

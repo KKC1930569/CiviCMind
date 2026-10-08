@@ -64,13 +64,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ initialPortal }) => {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-4xl bg-slate-900/80 border border-slate-800/80 rounded-3xl shadow-2xl backdrop-blur-xl overflow-hidden grid grid-cols-1 md:grid-cols-12 relative">
+    <div className="min-h-[85vh] flex items-center justify-center px-3.5 sm:px-4 py-6 sm:py-12">
+      <div className="w-full max-w-4xl bg-slate-900/80 border border-slate-800/80 rounded-2xl sm:rounded-3xl shadow-2xl backdrop-blur-xl overflow-hidden grid grid-cols-1 md:grid-cols-12 relative">
         {/* Subtle background glow */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
 
         {/* Left Side: Form Area (7 Cols) */}
-        <div className="p-8 sm:p-10 md:col-span-7 flex flex-col justify-between space-y-6">
+        <div className="p-4 sm:p-8 md:p-10 md:col-span-7 flex flex-col justify-between space-y-6">
           <div>
             {/* Portal Switcher Tabs */}
             <div className="flex p-1 rounded-2xl bg-slate-950 border border-slate-800 mb-6">

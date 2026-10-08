@@ -78,8 +78,8 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ initialRole }) => {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-lg bg-slate-900/80 border border-slate-800/80 p-8 sm:p-10 rounded-3xl shadow-2xl backdrop-blur-xl relative overflow-hidden">
+    <div className="min-h-[85vh] flex items-center justify-center px-3.5 sm:px-4 py-6 sm:py-12">
+      <div className="w-full max-w-lg bg-slate-900/80 border border-slate-800/80 p-4 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl shadow-2xl backdrop-blur-xl relative overflow-hidden">
         {/* Glow accent */}
         <div className="absolute top-0 right-0 w-72 h-72 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
 

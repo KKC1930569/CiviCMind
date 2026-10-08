@@ -153,7 +153,7 @@ export const ReportDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-6 sm:space-y-8">
       {/* Top Navigation */}
       <div className="flex items-center justify-between">
         <button
@@ -176,7 +176,7 @@ export const ReportDetailPage: React.FC = () => {
 
       {/* Main Header & Title */}
       <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <span className="text-xs font-mono px-2.5 py-1 rounded-md bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 uppercase tracking-wider font-bold">
             {report.case_id || `CM-2026-${report.id.toString().padStart(6, '0')}`}
           </span>
@@ -192,11 +192,11 @@ export const ReportDetailPage: React.FC = () => {
           <ImpactScoreIndicator score={report.human_impact_score} priority={report.priority_level} showDetails size="lg" />
         </div>
 
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+        <h1 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight">
           {report.title}
         </h1>
 
-        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs text-slate-400">
           <span className="flex items-center gap-1.5">
             <Clock className="w-3.5 h-3.5 text-slate-400" />
             Reported on {new Date(report.created_at).toLocaleString()}
@@ -216,15 +216,15 @@ export const ReportDetailPage: React.FC = () => {
       </div>
 
       {/* Action Command Ribbon (What-If Simulator & Work Order) */}
-      <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-cyan-950/20 to-slate-900 border border-slate-800 flex flex-wrap items-center justify-between gap-3 shadow-lg">
+      <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-cyan-950/20 to-slate-900 border border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-lg">
         <div className="text-xs text-slate-300">
           <strong className="text-white">CivicMind Intelligence Suite:</strong> Simulate repair outcome or dispatch work order
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <button
             onClick={() => setSimulatorOpen(true)}
-            className="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-cyan-500/20 transition"
+            className="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-md shadow-cyan-500/20 transition"
           >
             <Sparkles className="w-3.5 h-3.5" /> What-If Repair Simulator
           </button>
@@ -232,7 +232,7 @@ export const ReportDetailPage: React.FC = () => {
           {isAuthority && (
             <button
               onClick={() => setWorkOrderOpen(true)}
-              className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-purple-600/20 transition"
+              className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-md shadow-purple-600/20 transition"
             >
               <FileText className="w-3.5 h-3.5" /> Municipal Work Order
             </button>
@@ -241,11 +241,11 @@ export const ReportDetailPage: React.FC = () => {
       </div>
 
       {/* Lifecycle Progression Tracker */}
-      <div className="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl">
-        <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">
+      <div className="bg-slate-900/60 border border-slate-800 p-4 sm:p-6 rounded-2xl">
+        <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 sm:mb-4">
           Municipal Resolution Timeline
         </div>
-        <div className="grid grid-cols-5 gap-2 text-center">
+        <div className="grid grid-cols-5 gap-1.5 sm:gap-2 text-center">
           {timelineSteps.map((step, idx) => {
             const isCompleted = currentStepIdx >= idx && report.status !== 'REJECTED';
             const isCurrent = report.status === step;

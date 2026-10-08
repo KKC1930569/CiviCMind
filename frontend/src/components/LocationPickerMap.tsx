@@ -93,7 +93,15 @@ export const LocationPickerMap: React.FC<Props> = ({
       }
     }
 
+    const resizeObserver = new ResizeObserver(() => {
+      mapInstanceRef.current?.invalidateSize();
+    });
+    if (mapContainerRef.current) {
+      resizeObserver.observe(mapContainerRef.current);
+    }
+
     return () => {
+      resizeObserver.disconnect();
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;

@@ -176,14 +176,14 @@ export const AuthorityDashboardPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-6 sm:space-y-8">
       {/* Top Command Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold mb-2">
             <ShieldAlert className="w-3.5 h-3.5" /> MUNICIPAL AUTHORITY COMMAND CONSOLE
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight">
             City Infrastructure Operations
           </h1>
           <p className="text-xs sm:text-sm text-slate-400">
@@ -202,66 +202,66 @@ export const AuthorityDashboardPage: React.FC = () => {
       </div>
 
       {/* KPI Cards Grid (Requirement 12) */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-2.5 sm:gap-4">
         {/* Total Issues */}
-        <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Total Issues</span>
+        <div className="bg-slate-900/60 border border-slate-800 p-3.5 sm:p-5 rounded-2xl">
+          <div className="flex items-center justify-between text-slate-400 mb-1.5 sm:mb-2">
+            <span className="text-[11px] sm:text-xs font-medium">Total Issues</span>
             <Layers className="w-4 h-4 text-cyan-400" />
           </div>
-          <div className="text-3xl font-extrabold text-white">
+          <div className="text-2xl sm:text-3xl font-extrabold text-white">
             {stats?.total_reports || 0}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">Grid workorders</div>
+          <div className="text-[10px] sm:text-[11px] text-slate-400 mt-1">Grid workorders</div>
         </div>
 
         {/* Open Issues */}
-        <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Open Issues</span>
+        <div className="bg-slate-900/60 border border-slate-800 p-3.5 sm:p-5 rounded-2xl">
+          <div className="flex items-center justify-between text-slate-400 mb-1.5 sm:mb-2">
+            <span className="text-[11px] sm:text-xs font-medium">Open Issues</span>
             <Clock className="w-4 h-4 text-blue-400" />
           </div>
-          <div className="text-3xl font-extrabold text-blue-400">
+          <div className="text-2xl sm:text-3xl font-extrabold text-blue-400">
             {stats?.open_reports || 0}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">Pending initial review</div>
+          <div className="text-[10px] sm:text-[11px] text-slate-400 mt-1">Pending initial review</div>
         </div>
 
         {/* Critical Issues */}
-        <div className="bg-rose-950/20 border border-rose-500/30 p-5 rounded-2xl">
-          <div className="flex items-center justify-between text-rose-300 mb-2">
-            <span className="text-xs font-medium">Critical Issues</span>
+        <div className="bg-rose-950/20 border border-rose-500/30 p-3.5 sm:p-5 rounded-2xl">
+          <div className="flex items-center justify-between text-rose-300 mb-1.5 sm:mb-2">
+            <span className="text-[11px] sm:text-xs font-medium">Critical Issues</span>
             <Flame className="w-4 h-4 text-rose-400" />
           </div>
-          <div className="text-3xl font-extrabold text-rose-400">
+          <div className="text-2xl sm:text-3xl font-extrabold text-rose-400">
             {stats?.critical_reports || 0}
           </div>
-          <div className="text-[11px] text-rose-300/80 mt-1">Priority: CRITICAL</div>
+          <div className="text-[10px] sm:text-[11px] text-rose-300/80 mt-1">Priority: CRITICAL</div>
         </div>
 
         {/* Average Impact Score */}
-        <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Avg Impact Score</span>
+        <div className="bg-slate-900/60 border border-slate-800 p-3.5 sm:p-5 rounded-2xl">
+          <div className="flex items-center justify-between text-slate-400 mb-1.5 sm:mb-2">
+            <span className="text-[11px] sm:text-xs font-medium">Avg Impact Score</span>
             <Sparkles className="w-4 h-4 text-amber-400" />
           </div>
-          <div className="text-3xl font-extrabold text-amber-400">
+          <div className="text-2xl sm:text-3xl font-extrabold text-amber-400">
             {stats?.average_impact_score || 0}
             <span className="text-xs font-normal text-slate-400">/100</span>
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">Civic exposure average</div>
+          <div className="text-[10px] sm:text-[11px] text-slate-400 mt-1">Civic exposure average</div>
         </div>
 
         {/* Accessibility-Related Issues */}
-        <div className="bg-indigo-950/20 border border-indigo-500/30 p-5 rounded-2xl col-span-2 lg:col-span-1">
-          <div className="flex items-center justify-between text-indigo-300 mb-2">
-            <span className="text-xs font-medium">Accessibility Barriers</span>
+        <div className="bg-indigo-950/20 border border-indigo-500/30 p-3.5 sm:p-5 rounded-2xl col-span-2 lg:col-span-1">
+          <div className="flex items-center justify-between text-indigo-300 mb-1.5 sm:mb-2">
+            <span className="text-[11px] sm:text-xs font-medium">Accessibility Barriers</span>
             <Accessibility className="w-4 h-4 text-indigo-400" />
           </div>
-          <div className="text-3xl font-extrabold text-indigo-300">
+          <div className="text-2xl sm:text-3xl font-extrabold text-indigo-300">
             {stats?.accessibility_issue_count || 0}
           </div>
-          <div className="text-[11px] text-indigo-200/80 mt-1">Mobility & ADA queues</div>
+          <div className="text-[10px] sm:text-[11px] text-indigo-200/80 mt-1">Mobility & ADA queues</div>
         </div>
       </div>
 
@@ -379,10 +379,10 @@ export const AuthorityDashboardPage: React.FC = () => {
       </div>
 
       {/* Smart Prioritization Queue Table (Requirement 6) */}
-      <div className="bg-slate-900/60 border border-slate-800 rounded-3xl overflow-hidden space-y-4 p-6 shadow-xl">
+      <div className="bg-slate-900/60 border border-slate-800 rounded-2xl sm:rounded-3xl overflow-hidden space-y-4 p-4 sm:p-6 shadow-xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-bold text-white">
+            <h2 className="text-base sm:text-lg font-bold text-white">
               Smart Prioritization Queue
             </h2>
             <p className="text-xs text-slate-400">
@@ -391,11 +391,11 @@ export const AuthorityDashboardPage: React.FC = () => {
           </div>
 
           {/* Ranking Mode Toggle Buttons */}
-          <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar max-w-full bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
             <button
               type="button"
               onClick={() => setSortBy('impact')}
-              className={`px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 ${
+              className={`shrink-0 px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 ${
                 sortBy === 'impact' ? 'bg-cyan-500 text-white font-semibold' : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -404,7 +404,7 @@ export const AuthorityDashboardPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setSortBy('priority')}
-              className={`px-3 py-1.5 rounded-lg font-medium transition ${
+              className={`shrink-0 px-3 py-1.5 rounded-lg font-medium transition ${
                 sortBy === 'priority' ? 'bg-slate-800 text-white font-semibold' : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -413,7 +413,7 @@ export const AuthorityDashboardPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setSortBy('severity')}
-              className={`px-3 py-1.5 rounded-lg font-medium transition ${
+              className={`shrink-0 px-3 py-1.5 rounded-lg font-medium transition ${
                 sortBy === 'severity' ? 'bg-slate-800 text-white font-semibold' : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -422,7 +422,7 @@ export const AuthorityDashboardPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setSortBy('created_at')}
-              className={`px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 ${
+              className={`shrink-0 px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 ${
                 sortBy === 'created_at' ? 'bg-slate-800 text-white font-semibold' : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -529,8 +529,122 @@ export const AuthorityDashboardPage: React.FC = () => {
           </span>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto rounded-xl border border-slate-800">
+        {/* Mobile Incident Card List (< md screens) */}
+        <div className="block md:hidden space-y-3">
+          {filteredReports.length === 0 ? (
+            <div className="py-8 text-center text-slate-400 text-xs bg-slate-950/60 rounded-xl border border-slate-800">
+              No reports match the current criteria.
+            </div>
+          ) : (
+            filteredReports.map((r, idx) => {
+              let parsedReasons: string[] = [];
+              if (r.reasons) {
+                try {
+                  parsedReasons = JSON.parse(r.reasons);
+                } catch (e) {
+                  parsedReasons = (r.impact_notes || '').split(';').map(s => s.trim()).filter(Boolean);
+                }
+              } else if (r.impact_notes) {
+                parsedReasons = r.impact_notes.split(';').map(s => s.trim()).filter(Boolean);
+              }
+
+              return (
+                <div key={r.id} className="p-3.5 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-3 shadow-md">
+                  {/* Top Bar: Rank, Impact Score, Status */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono text-slate-400 font-bold">#{idx + 1}</span>
+                      <ImpactScoreIndicator score={r.human_impact_score} priority={r.priority_level} showDetails size="sm" />
+                    </div>
+                    <StatusBadge status={r.status} size="sm" />
+                  </div>
+
+                  {/* Title & Badges */}
+                  <div>
+                    <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                      {r.case_id && (
+                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">
+                          {r.case_id}
+                        </span>
+                      )}
+                      {r.defect_type && (
+                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-0.5">
+                          <Sparkles className="w-2.5 h-2.5" />
+                          {r.defect_type.replace(/_/g, ' ')}
+                        </span>
+                      )}
+                      {r.is_demo_data && (
+                        <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                          DEMO
+                        </span>
+                      )}
+                      {r.is_repeated_issue && (
+                        <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 flex items-center gap-0.5">
+                          <History className="w-2.5 h-2.5" /> REPEAT
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-sm font-semibold text-white leading-snug">{r.title}</h3>
+                  </div>
+
+                  {/* Category & Location */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <CategoryBadge category={r.category} />
+                    <span className="text-[11px] text-slate-400 truncate max-w-[200px]">
+                      {r.address || (r.latitude != null ? `${r.latitude.toFixed(3)}, ${r.longitude?.toFixed(3)}` : 'No location')}
+                    </span>
+                  </div>
+
+                  {/* Explainable Rationale Preview */}
+                  <div className="text-[11px] text-slate-400 bg-slate-900/60 p-2 rounded-xl border border-slate-850 italic">
+                    Reasons: {parsedReasons.slice(0, 2).join(' • ') || r.description}
+                  </div>
+
+                  {/* Actions Grid */}
+                  <div className="grid grid-cols-4 gap-1.5 pt-1 border-t border-slate-850">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSimReportId(r.id);
+                        setSimReportTitle(r.title);
+                      }}
+                      className="py-2 px-1 text-center rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[11px] font-semibold transition"
+                      title="Run What-If Repair Simulator"
+                    >
+                      Simulate
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setWoReportId(r.id)}
+                      className="py-2 px-1 text-center rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[11px] font-semibold transition"
+                      title="Generate Municipal Work Order"
+                    >
+                      Work Order
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openTriageModal(r)}
+                      className="py-2 px-1 text-center rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold transition"
+                    >
+                      Triage
+                    </button>
+                    <Link
+                      to={`/report/${r.id}`}
+                      className="py-2 px-1 text-center rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-semibold flex items-center justify-center gap-1 transition"
+                      title="Full Incident Dossier"
+                    >
+                      <span>Dossier</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </Link>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Desktop Table (>= md screens) */}
+        <div className="hidden md:block overflow-x-auto rounded-xl border border-slate-800">
           <table className="w-full text-left text-xs text-slate-300">
             <thead className="bg-slate-950 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-800">
               <tr>
@@ -664,8 +778,8 @@ export const AuthorityDashboardPage: React.FC = () => {
 
       {/* Quick Triage Modal */}
       {triageModalOpen && selectedReport && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-sm">
+          <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl space-y-4 sm:space-y-5 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2 text-purple-400 font-bold text-sm">
                 <SlidersHorizontal className="w-4 h-4" />
