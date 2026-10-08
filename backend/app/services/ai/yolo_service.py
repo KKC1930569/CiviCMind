@@ -68,25 +68,48 @@ class YOLOAnalysisService(BaseAIAnalysisService):
             self.device = "cpu"
             logger.info("[YOLO] CUDA GPU not detected - running inference on CPU")
 
-        # Resolve model path
-        candidate_paths = [
-            Path(settings.YOLO_MODEL_PATH),
-            Path(r"C:\Users\roope\work\best.pt"),
-            Path(r"C:\Users\roope\work\best_test.pt"),
+        # Resolve model path dynamically without hardcoded OS paths
+        candidate_paths: List[Path] = []
+        
+        env_model_path = os.getenv("YOLO_MODEL_PATH")
+        if env_model_path:
+            candidate_paths.append(Path(env_model_path))
+
+        current_file = Path(__file__).resolve()
+        # current_file: .../backend/app/services/ai/yolo_service.py
+        # parents[2] is .../backend/app, parents[3] is .../backend
+        app_models_path = current_file.parents[2] / "models" / "best.pt"
+        backend_models_path = current_file.parents[3] / "models" / "best.pt"
+
+        candidate_paths.extend([
+            app_models_path,
+            backend_models_path,
+            settings.BASE_DIR / "app" / "models" / "best.pt",
             settings.BASE_DIR / "models" / "best.pt",
-        ]
+            Path(settings.YOLO_MODEL_PATH),
+        ])
+
+        # Deduplicate paths while preserving priority order
+        unique_candidates: List[Path] = []
+        for cand in candidate_paths:
+            resolved_c = cand.resolve() if cand.is_absolute() else cand
+            if resolved_c not in unique_candidates:
+                unique_candidates.append(resolved_c)
 
         resolved_path = None
-        for cand in candidate_paths:
+        for cand in unique_candidates:
             if cand.exists() and cand.is_file():
                 resolved_path = cand
                 break
 
         if not resolved_path:
             logger.warning(
-                f"[YOLO] Trained model not found at any candidate paths: {[str(p) for p in candidate_paths]}. "
-                f"YOLO inference will return graceful error until weights are placed."
+                f"[YOLO] Trained model weights not found at candidate paths: {[str(p) for p in unique_candidates]}. "
+                f"YOLO inference will return explicit 'model_unavailable' status. "
+                f"Trained weights 'best.pt' must be supplied."
             )
+            self._is_initialized = True
+            self.model = None
             return
 
         logger.info(f"[YOLO] Loading trained weights from: {resolved_path}")

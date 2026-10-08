@@ -1,13 +1,55 @@
 import axios from 'axios';
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+/**
+ * Resolves the backend base URL (without /api suffix).
+ * Search order:
+ * 1. import.meta.env.VITE_API_URL
+ * 2. import.meta.env.VITE_API_BASE_URL
+ * 3. Localhost check: If running in dev mode or accessed via localhost/127.0.0.1, use http://127.0.0.1:8000
+ * 4. Production fallback: https://civicmind-ma7x.onrender.com
+ */
+function resolveApiBaseUrl(): string {
+  const envUrl = (
+    import.meta.env.VITE_API_URL || 
+    import.meta.env.VITE_API_BASE_URL || 
+    ''
+  ).trim();
+
+  if (envUrl) {
+    // Strip trailing slashes and /api if user supplied it with /api
+    return envUrl.replace(/\/+$/, '').replace(/\/api$/, '');
+  }
+
+  // Check if browser is running on localhost/local network
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (
+      host === 'localhost' ||
+      host === '127.0.0.1' ||
+      host === '[::1]' ||
+      host.endsWith('.local')
+    ) {
+      return 'http://127.0.0.1:8000';
+    }
+  }
+
+  // If in Vite dev server mode without custom env URL
+  if (import.meta.env.DEV) {
+    return 'http://127.0.0.1:8000';
+  }
+
+  // Default production backend on Render
+  return 'https://civicmind-ma7x.onrender.com';
+}
+
+export const API_BASE_URL = resolveApiBaseUrl();
 
 export const apiClient = axios.create({
   baseURL: `${API_BASE_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 15000,
+  timeout: 30000,
 });
 
 // Request interceptor to automatically attach JWT token
@@ -42,9 +84,9 @@ apiClient.interceptors.response.use(
 export function formatApiError(err: any): string {
   if (!err) return 'An unexpected error occurred.';
 
-  // Network / Connection Refused
+  // Network / Connection Refused / Service Sleeping
   if (err.code === 'ERR_NETWORK' || err.message?.includes('Network Error') || !err.response) {
-    return 'CivicMind Core API is currently unavailable. Please make sure the backend is running at http://127.0.0.1:8000.';
+    return `CivicMind Core API is currently unreachable at ${API_BASE_URL}. If using the cloud deployment, please wait 30 seconds for the free-tier service to finish waking up, then try again.`;
   }
 
   const status = err.response?.status;

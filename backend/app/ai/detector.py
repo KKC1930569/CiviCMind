@@ -6,10 +6,12 @@ Wraps the loaded trained YOLOv8 model and returns structured detection results.
 """
 
 import io
+import os
 from pathlib import Path
 from typing import Dict, Any, Union, Optional, List
 from PIL import Image
 
+from app.config import settings
 from app.services.ai.yolo_service import yolo_service, YOLODetectionItem, CLASS_CATEGORY_MAP
 from app.services.ai.interface import (
     AIDetectionResponse,
@@ -17,6 +19,49 @@ from app.services.ai.interface import (
     AccessibilityFeatureDetection,
     BBoxDict
 )
+
+# Dynamic Model Path Resolution via pathlib (No hardcoded Windows/OS paths)
+CURRENT_FILE = Path(__file__).resolve()
+# CURRENT_FILE: .../backend/app/ai/detector.py
+# parents[0]: .../backend/app/ai
+# parents[1]: .../backend/app
+# parents[2]: .../backend
+APP_MODELS_PATH = CURRENT_FILE.parents[1] / "models" / "best.pt"
+BACKEND_MODELS_PATH = CURRENT_FILE.parents[2] / "models" / "best.pt"
+
+def resolve_model_path() -> Optional[Path]:
+    """
+    Dynamically resolve the YOLO best.pt weights file path across
+    both local environments (Windows/macOS/Linux) and Render deployment.
+    
+    Candidate search priority:
+    1. YOLO_MODEL_PATH environment variable (if explicitly set and file exists)
+    2. backend/app/models/best.pt (application models directory)
+    3. backend/models/best.pt (backend models directory)
+    4. settings.BASE_DIR / "app" / "models" / "best.pt"
+    5. settings.BASE_DIR / "models" / "best.pt"
+    """
+    env_path = os.getenv("YOLO_MODEL_PATH")
+    if env_path:
+        p = Path(env_path)
+        if p.exists() and p.is_file():
+            return p.resolve()
+
+    candidates = [
+        APP_MODELS_PATH,
+        BACKEND_MODELS_PATH,
+        settings.BASE_DIR / "app" / "models" / "best.pt",
+        settings.BASE_DIR / "models" / "best.pt",
+    ]
+
+    for cand in candidates:
+        resolved = cand.resolve() if cand.is_absolute() else cand
+        if resolved.exists() and resolved.is_file():
+            return resolved
+
+    return None
+
+MODEL_PATH: Optional[Path] = resolve_model_path()
 
 def detect_issue(
     image: Union[str, Path, bytes, Any],
@@ -56,10 +101,10 @@ def detect_issue(
             "detections": [],
             "severity": "LOW",
             "severity_score": 10,
-            "severity_reasons": ["AI model weights are currently loading or unavailable."],
+            "severity_reasons": ["AI model weights are currently unavailable."],
             "status": "model_unavailable",
             "success": False,
-            "message": "AI model weights could not be loaded."
+            "message": "AI model weights could not be loaded. Trained weights 'best.pt' must be supplied."
         }
         
     # Support Path, str, bytes, PIL.Image

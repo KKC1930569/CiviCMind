@@ -24,14 +24,26 @@ class Settings:
     UPLOAD_DIR: Path = BASE_DIR / "uploads"
 
     # AI / YOLO Model Configuration
-    YOLO_MODEL_PATH: str = os.getenv("YOLO_MODEL_PATH", str(BASE_DIR / "models" / "best.pt"))
+    _app_model_path = BASE_DIR / "app" / "models" / "best.pt"
+    _backend_model_path = BASE_DIR / "models" / "best.pt"
+    _default_yolo_path = (
+        _app_model_path if _app_model_path.exists()
+        else (_backend_model_path if _backend_model_path.exists() else _app_model_path)
+    )
+    YOLO_MODEL_PATH: str = os.getenv("YOLO_MODEL_PATH", str(_default_yolo_path))
     YOLO_CONFIDENCE_THRESHOLD: float = float(os.getenv("YOLO_CONFIDENCE_THRESHOLD", "0.25"))
 
     # CORS
-    CORS_ORIGINS: list[str] = [
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ]
+    _cors_env = os.getenv("CORS_ORIGINS")
+    CORS_ORIGINS: list[str] = (
+        [origin.strip() for origin in _cors_env.split(",") if origin.strip()]
+        if _cors_env
+        else [
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            "https://civicmind-jggu.onrender.com",
+        ]
+    )
 
 settings = Settings()
 

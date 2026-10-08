@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { YOLODetectionItem } from '../types';
+import { API_BASE_URL } from '../api/client';
 
 interface DetectionOverlayProps {
   imageUrl: string;
@@ -61,7 +62,7 @@ export const DetectionOverlay: React.FC<DetectionOverlayProps> = ({
   // Convert relative /api/uploads/ to full URL if needed
   const resolvedUrl = imageUrl.startsWith('blob:') || imageUrl.startsWith('http://') || imageUrl.startsWith('https://') || imageUrl.startsWith('data:')
     ? imageUrl
-    : `${import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+    : `${API_BASE_URL}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
 
   return (
     <div className={`relative rounded-xl overflow-hidden border border-slate-700 bg-slate-950 flex items-center justify-center ${className}`}>

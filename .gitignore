@@ -37,12 +37,14 @@ backend/uploads/*
 .env
 .env.*
 !.env.example
+!frontend/.env.production
 *.pem
 *.key
 
-# Model Weights
+# Model Weights (Allow trained production weights under 25MB for deployment)
 *.pt
-backend/models/*.pt
+!backend/app/models/best.pt
+!backend/models/best.pt
 
 # Node / Frontend
 node_modules/

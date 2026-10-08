@@ -80,7 +80,7 @@ export const ForgotPasswordPage: React.FC = () => {
                   Because this is running in local development mode, click the secure link below to reset:
                 </p>
                 <Link
-                  to={devResetLink.replace('http://localhost:5173', '')}
+                  to={devResetLink.replace(/^https?:\/\/[^/]+/, '')}
                   className="inline-flex items-center gap-1.5 text-cyan-300 hover:text-cyan-200 font-semibold underline text-xs break-all"
                 >
                   Continue to Password Reset <ArrowRight className="w-3.5 h-3.5" />
