@@ -1,14 +1,19 @@
 import axios from 'axios';
 
+export const PRODUCTION_API_URL = 'https://civicmind-ma7x.onrender.com';
+export const LOCAL_DEV_API_URL = 'http://127.0.0.1:8000';
+
 /**
  * Resolves the backend base URL (without /api suffix).
- * Search order:
- * 1. import.meta.env.VITE_API_URL
- * 2. import.meta.env.VITE_API_BASE_URL
- * 3. Localhost check: If running in dev mode or accessed via localhost/127.0.0.1, use http://127.0.0.1:8000
- * 4. Production fallback: https://civicmind-ma7x.onrender.com
+ * 
+ * Rules:
+ * 1. Explicit environment variable: VITE_API_URL or VITE_API_BASE_URL
+ * 2. In production (import.meta.env.PROD): ALWAYS use PRODUCTION_API_URL.
+ *    Localhost is NEVER used as a production fallback!
+ * 3. In development (import.meta.env.DEV): use LOCAL_DEV_API_URL.
  */
 function resolveApiBaseUrl(): string {
+  // 1. Explicit environment variable
   const envUrl = (
     import.meta.env.VITE_API_URL || 
     import.meta.env.VITE_API_BASE_URL || 
@@ -16,30 +21,33 @@ function resolveApiBaseUrl(): string {
   ).trim();
 
   if (envUrl) {
-    // Strip trailing slashes and /api if user supplied it with /api
+    // Strip trailing slashes and redundant /api if supplied
     return envUrl.replace(/\/+$/, '').replace(/\/api$/, '');
   }
 
-  // Check if browser is running on localhost/local network
-  if (typeof window !== 'undefined') {
-    const host = window.location.hostname;
-    if (
-      host === 'localhost' ||
-      host === '127.0.0.1' ||
-      host === '[::1]' ||
-      host.endsWith('.local')
-    ) {
-      return 'http://127.0.0.1:8000';
-    }
+  // 2. Strict production mode guard - localhost is NEVER used
+  if (import.meta.env.PROD) {
+    return PRODUCTION_API_URL;
   }
 
-  // If in Vite dev server mode without custom env URL
+  // 3. Local development server
   if (import.meta.env.DEV) {
-    return 'http://127.0.0.1:8000';
+    if (typeof window !== 'undefined') {
+      const host = window.location.hostname;
+      if (
+        host === 'localhost' ||
+        host === '127.0.0.1' ||
+        host === '[::1]' ||
+        host.endsWith('.local')
+      ) {
+        return LOCAL_DEV_API_URL;
+      }
+    }
+    return LOCAL_DEV_API_URL;
   }
 
-  // Default production backend on Render
-  return 'https://civicmind-ma7x.onrender.com';
+  // 4. Default safe fallback
+  return PRODUCTION_API_URL;
 }
 
 export const API_BASE_URL = resolveApiBaseUrl();
